@@ -4,4 +4,6 @@ Logs/
 
 session/
 
-*.cfg
+client.cfg
+
+cred.py
