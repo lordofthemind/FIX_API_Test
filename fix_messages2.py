@@ -1,7 +1,7 @@
 import quickfix as fix
 import random
 from datetime import datetime
-from symbols import SYMBOLS
+from symbols.symbols import SYMBOLS
 
 symbols = SYMBOLS
 

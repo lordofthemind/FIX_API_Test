@@ -4,7 +4,7 @@ from fix_messages import create_heartbeat, create_market_data_request
 from cred.cred import SENDER_COMP_ID_FOR_MARKET_DATA, TARGET_COMP_ID
 import time
 import random
-from symbols import SYMBOLS
+from symbols.symbols import SYMBOLS
 
 symbols = SYMBOLS
 
@@ -81,4 +81,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-client_market_data
