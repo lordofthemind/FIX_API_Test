@@ -30,8 +30,21 @@ class Application(fix.Application):
         logging.info(f"ToApp: {message}")
 
     def fromApp(self, message, sessionID):
-        logging.info(f"FromApp: {message}")
-        self.onMessage(message, sessionID)
+        msg_type = fix.MsgType()
+        message.getHeader().getField(msg_type)
+
+        if msg_type.getValue() == fix.MsgType_MarketDataSnapshotFullRefresh:
+            # Handle market data snapshot full refresh message
+            logging.info("Received market data snapshot full refresh:")
+            print(message.toString())  # Print the entire message content
+
+        elif msg_type.getValue() == fix.MsgType_MarketDataIncrementalRefresh:
+            # Handle market data incremental refresh message
+            logging.info("Received market data incremental refresh:")
+            print(message.toString())  # Print the entire message content
+
+        else:
+            logging.info(f"Received unknown message type: {msg_type}")
 
     def onMessage(self, message, sessionID):
         logging.info(f"Message received: {message}")
