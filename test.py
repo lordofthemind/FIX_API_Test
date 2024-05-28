@@ -52,7 +52,7 @@ class Application(fix.Application):
 def main():
     logging.basicConfig(level=logging.INFO)
     
-    settings = fix.SessionSettings("client.cfg")
+    settings = fix.SessionSettings("client_market_data.cfg")
     application = Application()
     storeFactory = fix.FileStoreFactory(settings)
     logFactory = fix.FileLogFactory(settings)
@@ -68,3 +68,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+client_market_data
