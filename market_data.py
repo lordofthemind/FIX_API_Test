@@ -9,15 +9,15 @@ from fix_messages import (
 )
 from datetime import datetime
 import time
-import cred
+from cred.cred import TARGET_COMP_ID, SENDER_COMP_ID_FOR_MARKET_DATA, USERNAME, PASSWORD
 
 # Define constants for SENDER_COMP_ID and TARGET_COMP_ID
-SENDER_COMP_ID = cred.SENDER_COMP_ID_MARKET_DATA
-TARGET_COMP_ID = cred.TARGET_COMP_ID
+SENDER_COMP_ID = SENDER_COMP_ID_FOR_MARKET_DATA
+TARGET_COMP_ID = TARGET_COMP_ID
 
 # Define constants for USERNAME and PASSWORD
-USERNAME = cred.USERNAME
-PASSWORD = cred.PASSWORD
+USERNAME = USERNAME
+PASSWORD = PASSWORD
 
 def current_time():
     return datetime.utcnow().strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
