@@ -90,17 +90,17 @@ def create_sequence_reset(sender_comp_id, target_comp_id, seq_num):
     return msg
 
 # Application messages: Market Data Session
-def create_market_data_request(sender_comp_id, target_comp_id, seq_num, md_req_id, depth_level):
+def create_market_data_request(sender_comp_id, target_comp_id, seq_num, md_req_id, symbol, depth_level):
     msg = fix.Message()
     create_standard_header(msg, fix.MsgType_MarketDataRequest, sender_comp_id, target_comp_id, seq_num)
     msg.setField(fix.MDReqID(md_req_id))
-    msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+    msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT))
     msg.setField(fix.MarketDepth(depth_level))
-    msg.setField(fix.MDUpdateType(fix.MDUpdateType_FULL_REFRESH))
-    msg.setField(fix.NoRelatedSym(1))
-    symbol_group = fix.Group(146, 55)
-    symbol_group.setField(fix.Symbol(random.choice(symbols)))
-    msg.addGroup(symbol_group)
+    
+    no_related_sym_group = fix.Group(146, 55)
+    no_related_sym_group.setField(fix.Symbol(symbol))
+    msg.addGroup(no_related_sym_group)
+
     create_standard_trailer(msg)
     return msg
 

@@ -1,7 +1,12 @@
 import quickfix as fix
 import logging
-from fix_messages import create_heartbeat
+from fix_messages import create_heartbeat, create_market_data_request
 from cred.cred import SENDER_COMP_ID_FOR_MARKET_DATA, TARGET_COMP_ID
+import time
+import random
+from symbols import SYMBOLS
+
+symbols = SYMBOLS
 
 class Application(fix.Application):
     def onCreate(self, sessionID):
@@ -10,6 +15,7 @@ class Application(fix.Application):
     def onLogon(self, sessionID):
         logging.info(f"Logon: {sessionID}")
         self.send_heartbeat(sessionID)
+        self.send_market_data_request(sessionID)
 
     def onLogout(self, sessionID):
         logging.info(f"Logout: {sessionID}")
@@ -29,6 +35,14 @@ class Application(fix.Application):
 
     def onMessage(self, message, sessionID):
         logging.info(f"Message received: {message}")
+
+    def send_market_data_request(self, sessionID):
+        seq_num = 1  # Adjust the sequence number as necessary
+        md_req_id = "MDREQ001"  # Unique ID for the market data request
+        symbol = random.choice(symbols)
+        depth_level = 1  # Specify the depth level for the market data
+        market_data_request_msg = create_market_data_request(SENDER_COMP_ID_FOR_MARKET_DATA, TARGET_COMP_ID, seq_num, md_req_id, symbol, depth_level)
+        fix.Session.sendToTarget(market_data_request_msg, sessionID)
 
     def send_heartbeat(self, sessionID):
         seq_num = 1  # Adjust the sequence number as necessary
