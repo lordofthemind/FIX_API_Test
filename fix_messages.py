@@ -1,8 +1,9 @@
 import quickfix as fix
 import random
 from datetime import datetime
+from symbols import SYMBOLS
 
-symbols = ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CHF"]
+symbols = SYMBOLS
 
 def current_time():
     return datetime.utcnow().strftime("%Y%m%d-%H:%M:%S.%f")[:-3]

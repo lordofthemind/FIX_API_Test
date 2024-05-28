@@ -28,8 +28,6 @@ class Application(fix.Application):
 
     def onLogon(self, sessionID):
         logging.info(f"Logon: {sessionID}")
-        # Send a test message after logon
-        self.send_initial_messages(sessionID)
 
     def onLogout(self, sessionID):
         logging.info(f"Logout: {sessionID}")
@@ -49,31 +47,6 @@ class Application(fix.Application):
 
     def onMessage(self, message, sessionID):
         logging.info(f"Message received: {message}")
-        msg_type = fix.MsgType()
-        message.getHeader().getField(msg_type)
-
-        if msg_type.getValue() == fix.MsgType_ExecutionReport:
-            self.on_execution_report(message)
-        # Handle other message types as necessary
-
-    def send_initial_messages(self, sessionID):
-        # Example: send a market data request after logon
-        md_req_id = "MDReqID123"
-        depth_level = 1
-        market_data_request = create_market_data_request(SENDER_COMP_ID, TARGET_COMP_ID, 1, md_req_id, depth_level)
-        fix.Session.sendToTarget(market_data_request, sessionID)
-
-    def on_execution_report(self, msg):
-        exec_type = fix.ExecType()
-        msg.getField(exec_type)
-
-        if exec_type.getValue() == fix.ExecType_NEW:
-            logging.info("New order execution report received.")
-            # Process new order execution report
-        elif exec_type.getValue() == fix.ExecType_REJECTED:
-            logging.info("Order rejected execution report received.")
-            # Process rejected order execution report
-        # Add more conditions as per your requirements
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -87,15 +60,19 @@ def main():
     initiator.start()
     
     try:
-        # Perform logon
-        session_id = fix.SessionID("FIX.4.4", SENDER_COMP_ID, TARGET_COMP_ID)
-        logon_message = create_logon(SENDER_COMP_ID, TARGET_COMP_ID, 1, USERNAME, PASSWORD)
-        fix.Session.sendToTarget(logon_message, session_id)
-        
-        # Keep the application running
         while True:
-            time.sleep(1)
-    
+            session_id = fix.SessionID("FIX.4.4", SENDER_COMP_ID, TARGET_COMP_ID)
+            fix.Session.sendToTarget(create_heartbeat(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_test_request(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_logon(SENDER_COMP_ID, TARGET_COMP_ID, USERNAME, PASSWORD), session_id)
+            fix.Session.sendToTarget(create_logout(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_resend_request(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_reject(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_business_reject(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_sequence_reset(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+
+            time.sleep(1)  # Sleep to avoid flooding the server with requests
+
     except KeyboardInterrupt:
         initiator.stop()
 
