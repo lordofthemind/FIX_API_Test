@@ -1,11 +1,11 @@
 import quickfix as fix
 import random
-import time
+from datetime import datetime
 
 symbols = ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CHF"]
 
 def current_time():
-    return time.strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
+    return datetime.utcnow().strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
 
 def create_heartbeat(sender_comp_id, target_comp_id):
     msg = fix.Message()

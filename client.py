@@ -7,6 +7,7 @@ from fix_messages import (
     create_sequence_reset, create_market_data_request, create_new_order_single,
     create_order_status_request
 )
+import time
 
 class Application(fix.Application):
     def onCreate(self, sessionID):
@@ -47,7 +48,6 @@ def main():
     
     try:
         while True:
-            time.sleep(1)
             session_id = fix.SessionID("FIX.4.4", "CLIENT", "MARKET")
             fix.Session.sendToTarget(create_heartbeat("CLIENT", "MARKET"), session_id)
             fix.Session.sendToTarget(create_test_request("CLIENT", "MARKET"), session_id)
@@ -61,6 +61,8 @@ def main():
             fix.Session.sendToTarget(create_new_order_single("CLIENT", "MARKET", "OrderID1", 1000, fix.OrdType_MARKET), session_id)
             fix.Session.sendToTarget(create_order_status_request("CLIENT", "MARKET", "OrderID1"), session_id)
             # Add additional messages as needed
+
+            time.sleep(1)  # Sleep to avoid flooding the server with requests
 
     except KeyboardInterrupt:
         initiator.stop()
