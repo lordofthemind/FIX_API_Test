@@ -7,7 +7,15 @@ from fix_messages import (
     create_sequence_reset, create_market_data_request, create_new_order_single,
     create_order_status_request
 )
+from datetime import datetime
 import time
+
+# Define constants for SENDER_COMP_ID and TARGET_COMP_ID
+SENDER_COMP_ID = "CLIENT"
+TARGET_COMP_ID = "MARKET"
+
+def current_time():
+    return datetime.utcnow().strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
 
 class Application(fix.Application):
     def onCreate(self, sessionID):
@@ -48,18 +56,18 @@ def main():
     
     try:
         while True:
-            session_id = fix.SessionID("FIX.4.4", "CLIENT", "MARKET")
-            fix.Session.sendToTarget(create_heartbeat("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_test_request("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_logon("CLIENT", "MARKET", "Username", "Password"), session_id)
-            fix.Session.sendToTarget(create_logout("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_resend_request("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_reject("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_business_reject("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_sequence_reset("CLIENT", "MARKET"), session_id)
-            fix.Session.sendToTarget(create_market_data_request("CLIENT", "MARKET", "MDReqID1", 1), session_id)
-            fix.Session.sendToTarget(create_new_order_single("CLIENT", "MARKET", "OrderID1", 1000, fix.OrdType_MARKET), session_id)
-            fix.Session.sendToTarget(create_order_status_request("CLIENT", "MARKET", "OrderID1"), session_id)
+            session_id = fix.SessionID("FIX.4.4", SENDER_COMP_ID, TARGET_COMP_ID)
+            fix.Session.sendToTarget(create_heartbeat(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_test_request(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_logon(SENDER_COMP_ID, TARGET_COMP_ID, "Username", "Password"), session_id)
+            fix.Session.sendToTarget(create_logout(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_resend_request(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_reject(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_business_reject(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_sequence_reset(SENDER_COMP_ID, TARGET_COMP_ID), session_id)
+            fix.Session.sendToTarget(create_market_data_request(SENDER_COMP_ID, TARGET_COMP_ID, "MDReqID1", 1), session_id)
+            fix.Session.sendToTarget(create_new_order_single(SENDER_COMP_ID, TARGET_COMP_ID, "OrderID1", 1000, fix.OrdType_MARKET), session_id)
+            fix.Session.sendToTarget(create_order_status_request(SENDER_COMP_ID, TARGET_COMP_ID, "OrderID1"), session_id)
             # Add additional messages as needed
 
             time.sleep(1)  # Sleep to avoid flooding the server with requests
