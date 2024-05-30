@@ -5,8 +5,10 @@ from symbols.symbols import SYMBOLS
 
 symbols = SYMBOLS
 
+
 def current_time():
     return datetime.utcnow().strftime("%Y%m%d-%H:%M:%S.%f")[:-3]
+
 
 # Standard messages
 def create_standard_header(msg, msg_type, sender_comp_id, target_comp_id, seq_num):
@@ -18,27 +20,37 @@ def create_standard_header(msg, msg_type, sender_comp_id, target_comp_id, seq_nu
     header.setField(fix.MsgSeqNum(seq_num))
     header.setField(fix.SendingTime(current_time()))
 
+
 def create_standard_trailer(msg):
     trailer = msg.getTrailer()
     trailer.setField(fix.CheckSum("000"))
 
+
 # Session messages
 def create_heartbeat(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_Heartbeat, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_Heartbeat, sender_comp_id, target_comp_id, seq_num
+    )
     create_standard_trailer(msg)
     return msg
 
+
 def create_test_request(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_TestRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_TestRequest, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.TestReqID("Test123"))
     create_standard_trailer(msg)
     return msg
 
+
 def create_logon(sender_comp_id, target_comp_id, seq_num, username, password):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_Logon, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_Logon, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.EncryptMethod(fix.EncryptMethod_NONE))
     msg.setField(fix.HeartBtInt(30))
     msg.setField(fix.ResetSeqNumFlag(True))
@@ -47,23 +59,32 @@ def create_logon(sender_comp_id, target_comp_id, seq_num, username, password):
     create_standard_trailer(msg)
     return msg
 
+
 def create_logout(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_Logout, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_Logout, sender_comp_id, target_comp_id, seq_num
+    )
     create_standard_trailer(msg)
     return msg
 
+
 def create_resend_request(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_ResendRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_ResendRequest, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.BeginSeqNo(1))
     msg.setField(fix.EndSeqNo(0))  # Set to 0 for infinite
     create_standard_trailer(msg)
     return msg
 
+
 def create_reject(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_Reject, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_Reject, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.RefSeqNum(1))
     msg.setField(fix.RefTagID(4))
     msg.setField(fix.RefMsgType("D"))
@@ -71,9 +92,12 @@ def create_reject(sender_comp_id, target_comp_id, seq_num):
     create_standard_trailer(msg)
     return msg
 
+
 def create_business_reject(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_BusinessMessageReject, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_BusinessMessageReject, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.RefSeqNum(1))
     msg.setField(fix.RefMsgType("D"))
     msg.setField(fix.BusinessRejectReason(fix.BusinessRejectReason_OTHER))
@@ -81,22 +105,30 @@ def create_business_reject(sender_comp_id, target_comp_id, seq_num):
     create_standard_trailer(msg)
     return msg
 
+
 def create_sequence_reset(sender_comp_id, target_comp_id, seq_num):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_SequenceReset, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_SequenceReset, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.GapFillFlag(True))
     msg.setField(fix.NewSeqNo(seq_num + 1))
     create_standard_trailer(msg)
     return msg
 
+
 # Application messages: Market Data Session
-def create_market_data_request(sender_comp_id, target_comp_id, seq_num, md_req_id, symbol, depth_level):
+def create_market_data_request(
+    sender_comp_id, target_comp_id, seq_num, md_req_id, symbol, depth_level
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_MarketDataRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_MarketDataRequest, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.MDReqID(md_req_id))
     msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT))
     msg.setField(fix.MarketDepth(depth_level))
-    
+
     no_related_sym_group = fix.Group(146, 55)
     no_related_sym_group.setField(fix.Symbol(symbol))
     msg.addGroup(no_related_sym_group)
@@ -104,17 +136,35 @@ def create_market_data_request(sender_comp_id, target_comp_id, seq_num, md_req_i
     create_standard_trailer(msg)
     return msg
 
-def create_market_data_request_reject(sender_comp_id, target_comp_id, seq_num, md_req_id):
+
+def create_market_data_request_reject(
+    sender_comp_id, target_comp_id, seq_num, md_req_id
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_MarketDataRequestReject, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg,
+        fix.MsgType_MarketDataRequestReject,
+        sender_comp_id,
+        target_comp_id,
+        seq_num,
+    )
     msg.setField(fix.MDReqID(md_req_id))
     msg.setField(fix.Text("Market data request reject"))
     create_standard_trailer(msg)
     return msg
 
-def create_market_data_snapshot_full_refresh(sender_comp_id, target_comp_id, seq_num, md_req_id):
+
+def create_market_data_snapshot_full_refresh(
+    sender_comp_id, target_comp_id, seq_num, md_req_id
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_MarketDataSnapshotFullRefresh, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg,
+        fix.MsgType_MarketDataSnapshotFullRefresh,
+        sender_comp_id,
+        target_comp_id,
+        seq_num,
+    )
     msg.setField(fix.MDReqID(md_req_id))
     msg.setField(fix.NoMDEntries(1))
     md_entry_group = fix.Group(268, 269)
@@ -125,10 +175,22 @@ def create_market_data_snapshot_full_refresh(sender_comp_id, target_comp_id, seq
     create_standard_trailer(msg)
     return msg
 
+
 # Application messages: Trading Session
-def create_new_order_single(sender_comp_id, target_comp_id, seq_num, cl_ord_id, order_qty, ord_type, price=None, time_in_force=None):
+def create_new_order_single(
+    sender_comp_id,
+    target_comp_id,
+    seq_num,
+    cl_ord_id,
+    order_qty,
+    ord_type,
+    price=None,
+    time_in_force=None,
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_NewOrderSingle, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_NewOrderSingle, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.ClOrdID(cl_ord_id))
     msg.setField(fix.HandlInst(fix.HandlInst_MANUAL_ORDER_BEST_EXECUTION))
     msg.setField(fix.Symbol(random.choice(symbols)))
@@ -143,9 +205,14 @@ def create_new_order_single(sender_comp_id, target_comp_id, seq_num, cl_ord_id, 
     create_standard_trailer(msg)
     return msg
 
-def create_order_cancel_request(sender_comp_id, target_comp_id, seq_num, cl_ord_id, orig_cl_ord_id, symbol, side):
+
+def create_order_cancel_request(
+    sender_comp_id, target_comp_id, seq_num, cl_ord_id, orig_cl_ord_id, symbol, side
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_OrderCancelRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_OrderCancelRequest, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.ClOrdID(cl_ord_id))
     msg.setField(fix.OrigClOrdID(orig_cl_ord_id))
     msg.setField(fix.Symbol(symbol))
@@ -154,9 +221,18 @@ def create_order_cancel_request(sender_comp_id, target_comp_id, seq_num, cl_ord_
     create_standard_trailer(msg)
     return msg
 
-def create_order_cancel_replace_request(sender_comp_id, target_comp_id, seq_num, cl_ord_id, orig_cl_ord_id, order_qty, price):
+
+def create_order_cancel_replace_request(
+    sender_comp_id, target_comp_id, seq_num, cl_ord_id, orig_cl_ord_id, order_qty, price
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_OrderCancelReplaceRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg,
+        fix.MsgType_OrderCancelReplaceRequest,
+        sender_comp_id,
+        target_comp_id,
+        seq_num,
+    )
     msg.setField(fix.ClOrdID(cl_ord_id))
     msg.setField(fix.OrigClOrdID(orig_cl_ord_id))
     msg.setField(fix.Symbol(random.choice(symbols)))
@@ -168,9 +244,14 @@ def create_order_cancel_replace_request(sender_comp_id, target_comp_id, seq_num,
     create_standard_trailer(msg)
     return msg
 
-def create_order_cancel_reject(sender_comp_id, target_comp_id, seq_num, orig_cl_ord_id, cl_ord_id):
+
+def create_order_cancel_reject(
+    sender_comp_id, target_comp_id, seq_num, orig_cl_ord_id, cl_ord_id
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_OrderCancelReject, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_OrderCancelReject, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.OrderID("Order123"))
     msg.setField(fix.ClOrdID(cl_ord_id))
     msg.setField(fix.OrigClOrdID(orig_cl_ord_id))
@@ -180,16 +261,36 @@ def create_order_cancel_reject(sender_comp_id, target_comp_id, seq_num, orig_cl_
     create_standard_trailer(msg)
     return msg
 
+
 def create_order_status_request(sender_comp_id, target_comp_id, seq_num, cl_ord_id):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_OrderStatusRequest, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_OrderStatusRequest, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.ClOrdID(cl_ord_id))
     create_standard_trailer(msg)
     return msg
 
-def create_execution_report(sender_comp_id, target_comp_id, seq_num, order_id, cl_ord_id, exec_id, exec_type, ord_status, symbol, side, leaves_qty, cum_qty, avg_px):
+
+def create_execution_report(
+    sender_comp_id,
+    target_comp_id,
+    seq_num,
+    order_id,
+    cl_ord_id,
+    exec_id,
+    exec_type,
+    ord_status,
+    symbol,
+    side,
+    leaves_qty,
+    cum_qty,
+    avg_px,
+):
     msg = fix.Message()
-    create_standard_header(msg, fix.MsgType_ExecutionReport, sender_comp_id, target_comp_id, seq_num)
+    create_standard_header(
+        msg, fix.MsgType_ExecutionReport, sender_comp_id, target_comp_id, seq_num
+    )
     msg.setField(fix.OrderID(order_id))
     msg.setField(fix.ClOrdID(cl_ord_id))
     msg.setField(fix.ExecID(exec_id))
