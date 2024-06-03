@@ -2,8 +2,11 @@ import quickfix as fix
 import random
 from datetime import datetime
 from symbols.symbols import SYMBOLS
+from cred.cred import PASSWORD, USERNAME
 
 symbols = SYMBOLS
+password = PASSWORD
+username = USERNAME
 
 
 def current_time():
