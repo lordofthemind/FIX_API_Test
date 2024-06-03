@@ -1,15 +1,20 @@
 import quickfix as fix
 import logging
-from datetime import datetime
+import time
 
 
 class MyApplication(fix.Application):
+    def __init__(self):
+        self.logged_in = False
+        self.heartbeat_sent = False  # Add heartbeat_sent attribute
+
     def onCreate(self, sessionID):
         logging.info(f"Session created: {sessionID}")
 
     def onLogon(self, sessionID):
         logging.info(f"Logon: {sessionID}")
         self.sendHeartbeat(sessionID)
+        self.logged_in = True
 
     def sendHeartbeat(self, sessionID):
         heartbeat_msg = fix.Message()
@@ -20,6 +25,7 @@ class MyApplication(fix.Application):
 
     def onLogout(self, sessionID):
         logging.info(f"Logout: {sessionID}")
+        self.logged_in = False
 
     def toAdmin(self, message, sessionID):
         logging.info(f"ToAdmin: {message}")
@@ -44,7 +50,7 @@ def setup_logging():
 
 def main():
     setup_logging()
-    settings = fix.SessionSettings("fix_client.cfg")
+    settings = fix.SessionSettings("client_market_data.cfg")
     application = MyApplication()
     storeFactory = fix.FileStoreFactory(settings)
     logFactory = fix.FileLogFactory(settings)
@@ -54,8 +60,20 @@ def main():
 
     try:
         while True:
-            pass
+            if application.logged_in:
+                if application.heartbeat_sent:
+                    logging.info("Heartbeat sent successfully")
+                    logging.info("Login successful")
+                    break
+                else:
+                    logging.info("Waiting for heartbeat to be sent...")
+            else:
+                time.sleep(1)
     except KeyboardInterrupt:
+        logging.info("Keyboard interrupt received. Exiting...")
+    except Exception as e:
+        logging.error(f"An error occurred: {str(e)}")
+    finally:
         initiator.stop()
 
 
