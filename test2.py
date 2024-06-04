@@ -6,7 +6,7 @@ import time
 class MyApplication(fix.Application):
     def __init__(self):
         self.logged_in = False
-        self.heartbeat_sent = False  # Add heartbeat_sent attribute
+        self.heartbeat_sent = False
 
     def onCreate(self, sessionID):
         logging.info(f"Session created: {sessionID}")
@@ -22,6 +22,7 @@ class MyApplication(fix.Application):
         header.setField(fix.BeginString(fix.BeginString_FIX44))
         header.setField(fix.MsgType(fix.MsgType_Heartbeat))
         fix.Session.sendToTarget(heartbeat_msg, sessionID)
+        self.heartbeat_sent = True  # Mark as heartbeat sent
 
     def onLogout(self, sessionID):
         logging.info(f"Logout: {sessionID}")
@@ -32,6 +33,12 @@ class MyApplication(fix.Application):
 
     def fromAdmin(self, message, sessionID):
         logging.info(f"FromAdmin: {message}")
+        msg_type = fix.MsgType()
+        message.getHeader().getField(msg_type)
+        if msg_type.getValue() == fix.MsgType_Logon:
+            self.logged_in = True
+        elif msg_type.getValue() == fix.MsgType_Heartbeat:
+            self.heartbeat_sent = True
 
     def toApp(self, message, sessionID):
         logging.info(f"ToApp: {message}")
